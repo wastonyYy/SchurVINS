@@ -19,3 +19,24 @@
 [submodule "catkin_boost_python_buildtool"]
 	path = catkin_boost_python_buildtool
 	url = https://github.com/ethz-asl/catkin_boost_python_buildtool.git
+[submodule "cmake_external_project_catkin"]
+	path = cmake_external_project_catkin
+	url = https://github.com/zurich-eye/cmake_external_project_catkin.git
+[submodule "fast_neon"]
+	path = fast_neon
+	url = https://github.com/uzh-rpg/fast_neon.git
+[submodule "opengv"]
+	path = opengv
+	url = https://github.com/ethz-asl/opengv.git
+[submodule "minkindr_ros"]
+	path = minkindr_ros
+	url = https://github.com/ethz-asl/minkindr_ros.git
+[submodule "ceres_catkin"]
+	path = ceres_catkin
+	url = https://github.com/ethz-asl/ceres_catkin.git
+[submodule "dbow2_catkin"]
+	path = dbow2_catkin
+	url = https://github.com/uzh-rpg/dbow2_catkin.git
+[submodule "rpg_trajectory_evaluation"]
+	path = rpg_trajectory_evaluation
+	url = https://github.com/uzh-rpg/rpg_trajectory_evaluation.git
