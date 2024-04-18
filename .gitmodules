@@ -7,3 +7,6 @@
 [submodule "glog_catkin"]
 	path = glog_catkin
 	url = https://github.com/ethz-asl/glog_catkin.git
+[submodule "eigen_checks"]
+	path = eigen_checks
+	url = https://github.com/ethz-asl/eigen_checks.git
