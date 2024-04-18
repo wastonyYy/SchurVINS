@@ -11,11 +11,13 @@ RUN apt update && \
     apt install -y libeigen3-dev libopencv-dev && \
     apt install -y ros-${ROS_DISTRO}-cv-bridge && \
     DEBIAN_FRONTEND=noninteractive apt install -y keyboard-configuration && \
-    sudo apt install -y libglew-dev libyaml-cpp-dev && \
-    sudo apt install -y libblas-dev liblapack-dev libsuitesparse-dev && \
-    sudo apt install -y ros-${ROS_DISTRO}-pcl-conversions ros-${ROS_DISTRO}-pcl-ros ros-${ROS_DISTRO}-pcl-msgs && \
-    sudo apt install -y ros-${ROS_DISTRO}-tf ros-${ROS_DISTRO}-tf2 ros-${ROS_DISTRO}-laser-geometry && \
-    sudo apt install -y ros-${ROS_DISTRO}-rviz && \
+    \
+    apt install -y libgoogle-glog-dev libgflags-dev && \
+    apt install -y libglew-dev libyaml-cpp-dev && \
+    apt install -y libblas-dev liblapack-dev libsuitesparse-dev && \
+    apt install -y ros-${ROS_DISTRO}-pcl-conversions ros-${ROS_DISTRO}-pcl-ros ros-${ROS_DISTRO}-pcl-msgs && \
+    apt install -y ros-${ROS_DISTRO}-tf ros-${ROS_DISTRO}-tf2 ros-${ROS_DISTRO}-laser-geometry && \
+    apt install -y ros-${ROS_DISTRO}-rviz && \
     rm -rf /var/lib/apt/lists/*
 
 # setup user
