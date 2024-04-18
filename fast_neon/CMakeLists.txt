@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.3)
 SET(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Werror -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unknown-pragmas")
 
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mfpu=neon -march=native")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 ELSE()
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -mmmx -msse -msse -msse2 -msse3 -mssse3 -fomit-frame-pointer")
 ENDIF()
@@ -26,7 +26,7 @@ set(SOURCES
   src/nonmax_3x3.cpp
   )
 
-IF(DEFINED ENV{ARM_ARCHITECTURE})
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
   LIST(APPEND SOURCES ${PROJECT_SOURCE_DIR}/src/faster_corner_9_neon.cpp)
 ELSE()
   LIST(APPEND SOURCES ${PROJECT_SOURCE_DIR}/src/faster_corner_10_sse.cpp)
