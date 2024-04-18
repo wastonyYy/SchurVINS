@@ -22,9 +22,6 @@
 [submodule "cmake_external_project_catkin"]
 	path = cmake_external_project_catkin
 	url = https://github.com/zurich-eye/cmake_external_project_catkin.git
-[submodule "fast_neon"]
-	path = fast_neon
-	url = https://github.com/uzh-rpg/fast_neon.git
 [submodule "opengv"]
 	path = opengv
 	url = https://github.com/ethz-asl/opengv.git
