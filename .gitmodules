@@ -13,3 +13,6 @@
 [submodule "gflags_catkin"]
 	path = gflags_catkin
 	url = https://github.com/ethz-asl/gflags_catkin.git
+[submodule "minkindr"]
+	path = minkindr
+	url = https://github.com/ethz-asl/minkindr.git
