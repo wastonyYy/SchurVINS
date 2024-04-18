@@ -34,9 +34,6 @@
 [submodule "ceres_catkin"]
 	path = ceres_catkin
 	url = https://github.com/ethz-asl/ceres_catkin.git
-[submodule "dbow2_catkin"]
-	path = dbow2_catkin
-	url = https://github.com/uzh-rpg/dbow2_catkin.git
 [submodule "rpg_trajectory_evaluation"]
 	path = rpg_trajectory_evaluation
 	url = https://github.com/uzh-rpg/rpg_trajectory_evaluation.git
