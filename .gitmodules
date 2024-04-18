@@ -40,3 +40,6 @@
 [submodule "rpg_trajectory_evaluation"]
 	path = rpg_trajectory_evaluation
 	url = https://github.com/uzh-rpg/rpg_trajectory_evaluation.git
+[submodule "numpy_eigen"]
+	path = numpy_eigen
+	url = https://github.com/ethz-asl/numpy_eigen.git
