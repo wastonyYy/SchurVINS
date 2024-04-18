@@ -12,7 +12,7 @@ RUN apt update && \
     apt install -y ros-${ROS_DISTRO}-cv-bridge && \
     DEBIAN_FRONTEND=noninteractive apt install -y keyboard-configuration && \
     \
-    apt install -y python-catkin-tools libgoogle-glog-dev libgflags-dev && \
+    apt install -y python3-catkin-tools libgoogle-glog-dev libgflags-dev && \
     apt install -y libglew-dev libyaml-cpp-dev && \
     apt install -y libblas-dev liblapack-dev libsuitesparse-dev && \
     apt install -y ros-${ROS_DISTRO}-pcl-conversions ros-${ROS_DISTRO}-pcl-ros ros-${ROS_DISTRO}-pcl-msgs && \
