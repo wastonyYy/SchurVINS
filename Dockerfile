@@ -17,7 +17,7 @@ RUN apt update && \
     apt install -y libblas-dev liblapack-dev libsuitesparse-dev && \
     apt install -y ros-${ROS_DISTRO}-pcl-conversions ros-${ROS_DISTRO}-pcl-ros ros-${ROS_DISTRO}-pcl-msgs && \
     apt install -y ros-${ROS_DISTRO}-tf ros-${ROS_DISTRO}-tf2 ros-${ROS_DISTRO}-laser-geometry && \
-    apt install -y ros-${ROS_DISTRO}-rviz && \
+    apt install -y ros-${ROS_DISTRO}-rviz ros-${ROS_DISTRO}-rqt && \
     rm -rf /var/lib/apt/lists/*
 
 # setup user
