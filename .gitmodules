@@ -16,3 +16,6 @@
 [submodule "minkindr"]
 	path = minkindr
 	url = https://github.com/ethz-asl/minkindr.git
+[submodule "catkin_boost_python_buildtool"]
+	path = catkin_boost_python_buildtool
+	url = https://github.com/ethz-asl/catkin_boost_python_buildtool.git
