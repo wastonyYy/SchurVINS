@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 
 SET(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Werror -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unknown-pragmas")
 
+# set(ENV{ARM_ARCHITECTURE} aarch64)
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
   add_definitions(-D__ARM_NEON__)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
