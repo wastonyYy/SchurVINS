@@ -1,5 +1,5 @@
 project(svo_ceres_backend)
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1)
 
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
@@ -9,11 +9,15 @@ catkin_simple(ALL_DEPS_REQUIRED)
 include(SvoSetup)
 
 # OpenMP
-find_package(OpenMP QUIET)
-if (OPENMP_FOUND)
-  message(STATUS "OpenMP found")
-  add_definitions(-DUSE_OPENMP)
-endif ()
+if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
+  set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
+  set(OpenMP_CXX_LIB_NAMES "libgomp")
+  set(OpenMP_libgomp_LIBRARY "/usr/lib/aarch64-linux-gnu/libgomp.so.1.0.0")
+endif()
+find_package(OpenMP REQUIRED)
+message(STATUS "OpenMP found")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+add_definitions(-DUSE_OPENMP)
 
 #############
 # LIBRARIES #
