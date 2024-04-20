@@ -9,9 +9,9 @@ catkin_simple(ALL_DEPS_REQUIRED)
 include(SvoSetup)
 
 # OpenMP
+set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
+set(OpenMP_CXX_LIB_NAMES "libgomp")
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
-  set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
-  set(OpenMP_CXX_LIB_NAMES "libgomp")
   set(OpenMP_libgomp_LIBRARY "/usr/lib/aarch64-linux-gnu/libgomp.so.1.0.0")
 endif()
 find_package(OpenMP REQUIRED)
