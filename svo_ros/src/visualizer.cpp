@@ -187,7 +187,6 @@ Visualizer::Visualizer(const std::string& trace_dir,
   pub_info_ = pnh_.advertise<svo_msgs::Info>("info", 10);
   pub_markers_ = pnh_.advertise<visualization_msgs::Marker>("markers", 100);
   pub_pc_ = pnh_.advertise<PointCloud>("pointcloud", 1);
-  pub_odom_ = pnh_.advertise<nav_msgs::Odometry>("odom", 10);
   pub_dense_.resize(n_cameras);
   pub_images_.resize(n_cameras);
   pub_cam_poses_.resize(n_cameras);

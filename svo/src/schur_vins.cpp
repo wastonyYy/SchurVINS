@@ -155,7 +155,7 @@ void SchurVINS::PredictionState(const Eigen::Vector3d& acc, const Eigen::Vector3
 }
 
 void SchurVINS::Prediction(double _dt, const Eigen::Vector3d& _acc, const Eigen::Vector3d& _gyr) {
-    CHECK(_dt >= 0 && _dt < 0.015) << "dt: " << _dt;
+    // CHECK(_dt >= 0 && _dt < 0.015) << "dt: " << _dt;
     Eigen::Vector3d acc = _acc - curr_state->ba;
     Eigen::Vector3d gyr = _gyr - curr_state->bg;
 

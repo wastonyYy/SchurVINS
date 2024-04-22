@@ -39,12 +39,14 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 SHELL ["/bin/zsh", "-c"]
 
 # compile project
-WORKDIR /home/$USERNAME/code/ros_ws
+WORKDIR /home/${USERNAME}/code/ros_ws
 RUN git clone --depth 1 --recursive https://github.com/EnderMandS/SchurVINS.git src && \
-    chmod 777 -R /home/$USERNAME/code/ros_ws && . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    chmod 777 -R /home/${USERNAME}/code/ros_ws && . /opt/ros/${ROS_DISTRO}/setup.sh && \
     catkin_make --only-pkg-with-deps ceres_catkin -DCMAKE_BUILD_TYPE=Release && \
     catkin_make -DCATKIN_WHITELIST_PACKAGES="" -DCMAKE_BUILD_TYPE=Release && \
-    echo "source /home/m/code/ros_ws/devel/setup.zsh" >> /home/${USERNAME}/.zshrc
+    echo "source /home/m/code/ros_ws/devel/setup.zsh" >> /home/${USERNAME}/.zshrc && \
+    cd /home/${USERNAME}/code/ros_ws/src/svo_online_loopclosing/vocabularies && \
+    wget http://rpg.ifi.uzh.ch/svo2/vocabularies.tar.gz -O - | tar -xz
 
 WORKDIR /home/${USERNAME}/code/ros_ws
 
