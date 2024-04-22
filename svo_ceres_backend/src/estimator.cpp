@@ -1152,7 +1152,7 @@ void Estimator::optimize(size_t num_iter, size_t num_threads, bool verbose)
 #else
 void Estimator::optimize(size_t num_iter, size_t /*num_threads*/,
                          bool verbose) // avoid warning since numThreads unused
-#warning openmp not detected, your system may be slower than expected
+// #warning openmp not detected, your system may be slower than expected
 #endif
 
 {  

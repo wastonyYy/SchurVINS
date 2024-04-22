@@ -14,10 +14,12 @@ if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
   set(OpenMP_CXX_LIB_NAMES "libgomp")
   set(OpenMP_libgomp_LIBRARY "/usr/lib/aarch64-linux-gnu/libgomp.so.1.0.0")
 endif()
-find_package(OpenMP REQUIRED)
-message(STATUS "OpenMP found")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-add_definitions(-DUSE_OPENMP)
+find_package(OpenMP QUIET)
+if (OPENMP_FOUND)
+  message(STATUS "OpenMP found")
+  add_definitions(-DUSE_OPENMP)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif ()
 
 #############
 # LIBRARIES #

@@ -8,7 +8,7 @@ ARG PROJECT_NAME=schurvins
 RUN apt update && \
     apt install -y vim tree wget curl git unzip ninja-build && \
     apt install -y zsh && \
-    apt install -y libgomp1 libomp-dev && \
+    apt install -y libgomp1 && \
     apt install -y libeigen3-dev libopencv-dev libopencv-contrib-dev && \
     apt install -y ros-${ROS_DISTRO}-cv-bridge && \
     DEBIAN_FRONTEND=noninteractive apt install -y keyboard-configuration && \

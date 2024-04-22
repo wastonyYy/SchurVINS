@@ -79,6 +79,7 @@ public:
   ros::Publisher pub_info_;
   ros::Publisher pub_markers_;
   ros::Publisher pub_pc_;
+  ros::Publisher pub_odom_;
   PointCloud::Ptr pc_;
   std::vector<ros::Publisher> pub_cam_poses_;
   std::vector<ros::Publisher> pub_dense_;
