@@ -366,37 +366,65 @@ void SvoInterface::monoCallback(const sensor_msgs::ImageConstPtr& msg)
   imageCallbackPostprocessing();
 }
 
-void SvoInterface::stereoCallback(
-    const sensor_msgs::ImageConstPtr& msg0,
-    const sensor_msgs::ImageConstPtr& msg1)
-{
-  if(idle_)
-    return;
 
-  cv::Mat img0, img1;
-  try {
-    img0 = cv_bridge::toCvShare(msg0, "mono8")->image;
-    img1 = cv_bridge::toCvShare(msg1, "mono8")->image;
-  } catch (cv_bridge::Exception& e) {
-    ROS_ERROR("cv_bridge exception: %s", e.what());
-  }
+/**
++ * Callback function for stereo images.
++ *
++ * @param msg0 Pointer to the first stereo image message.
++ * @param msg1 Pointer to the second stereo image message.
++ *
++ * This function first checks if the SVO interface is idle. If it is, the function
++ * returns immediately. It then attempts to convert the stereo images to
++ * OpenCV matrices. If this fails, an error message is logged.
++ *
++ * Next, it attempts to set the IMU prior using the timestamp of the first image
++ * message. If this fails, a debug message is logged.
++ *
++ * The function then calls the imageCallbackPreprocessing function.
++ *
++ * After that, it calls the processImageBundle function with the stereo images
++ * and the timestamp of the first image message.
++ *
++ * The function then calls the publishResults function with the stereo images
++ * and the timestamp of the first image message.
++ *
++ * If the SVO interface is in the paused state and automatic reinitialization
++ * is enabled, the start function of the SVO interface is called.
++ *
++ * Finally, the imageCallbackPostprocessing function is called.
++ */
+ void SvoInterface::stereoCallback(
+     const sensor_msgs::ImageConstPtr& msg0,
+     const sensor_msgs::ImageConstPtr& msg1)
+ {
+   if(idle_)
+     return;
+ 
+   cv::Mat img0, img1;
+   try {
+     img0 = cv_bridge::toCvShare(msg0, "mono8")->image;
+     img1 = cv_bridge::toCvShare(msg1, "mono8")->image;
+   } catch (cv_bridge::Exception& e) {
+     ROS_ERROR("cv_bridge exception: %s", e.what());
+   }
+ 
+   if(!setImuPrior(msg0->header.stamp.toNSec()))
+   {
+     VLOG(3) << "Could not align gravity! Attempting again in next iteration.";
+     return;
+   }
+ 
+   imageCallbackPreprocessing(msg0->header.stamp.toNSec());
+ 
+   processImageBundle({img0, img1}, msg0->header.stamp.toNSec());
+   publishResults({img0, img1}, msg0->header.stamp.toNSec());
+ 
+   if(svo_->stage() == Stage::kPaused && automatic_reinitialization_)
+     svo_->start();
+ 
+   imageCallbackPostprocessing();
+ }
 
-  if(!setImuPrior(msg0->header.stamp.toNSec()))
-  {
-    VLOG(3) << "Could not align gravity! Attempting again in next iteration.";
-    return;
-  }
-
-  imageCallbackPreprocessing(msg0->header.stamp.toNSec());
-
-  processImageBundle({img0, img1}, msg0->header.stamp.toNSec());
-  publishResults({img0, img1}, msg0->header.stamp.toNSec());
-
-  if(svo_->stage() == Stage::kPaused && automatic_reinitialization_)
-    svo_->start();
-
-  imageCallbackPostprocessing();
-}
 
 void SvoInterface::imuCallback(const sensor_msgs::ImuConstPtr& msg)
 {

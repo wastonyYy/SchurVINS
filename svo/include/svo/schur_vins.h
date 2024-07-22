@@ -13,7 +13,10 @@ more details.
 You should have received a copy of the GNU General Public License along 
 with this program. If not, see <https://www.gnu.org/licenses/>.
 */
-#pragma once
+// #pragma once
+#ifndef SVO_SCHUR_VINS_H_
+#define SVO_SCHUR_VINS_H_
+
 
 #include <svo/common/frame.h>
 #include <svo/global.h>
@@ -24,6 +27,21 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 #include <set>
 
 namespace schur_vins {
+// 声明 Vector15d 类型
+// using Vector15d = Eigen::Matrix<double, 15, 1>;
+
+// extern Vector15d global_dx_imu_data;
+// extern Vector15d& global_dx_imu;
+// Vector15d global_dx_imu_data = Vector15d::Zero();
+
+// static Vector15d _dx_imu_1; 
+// extern Vector15d _dx_imu_1; 
+extern Eigen::Vector3d _vel ;
+
+// extern Eigen::Vector3d vel;
+// Eigen::VectorXd _dx_imu(15);
+
+// Vector15d& _dx_imu=global_dx_imu;
 
 class SchurVINS {
    public:
@@ -42,6 +60,9 @@ class SchurVINS {
     void Forward(const svo::FrameBundle::Ptr frame_bundle);
     int Backward(const svo::FrameBundle::Ptr frame_bundle);
     bool StructureOptimize(const svo::PointPtr& optimize_points);
+    //改动
+    // static Vector15d global_dx_imu_data;
+    // static Vector15d& global_dx_imu;
 
    private:
     class ImuState {
@@ -62,6 +83,7 @@ class SchurVINS {
         Eigen::Vector3d gyr = Eigen::Vector3d::Zero();
         double ts = -1;
         int64_t id = 0;
+        // static Eigen::Vector3d _vel;
     };
 
     void InitState(double _ts, const Eigen::Vector3d& _acc, const Eigen::Vector3d& _gyr);
@@ -124,3 +146,5 @@ inline Eigen::Matrix3d SkewMatrix(const Eigen::Vector3d& w) {
 }
 }  // namespace Utility
 }  // namespace schur_vins
+
+#endif //

@@ -64,7 +64,7 @@ size_t PoseOptimizer::run(const FrameBundle::Ptr& frame_bundle, double reproj_th
     frame->T_f_w_ = frame->T_cam_imu()*T_imu_world;
   }
 
-  LOG(INFO) << std::fixed << "optimizePose: " << frame_bundle->getMinTimestampSeconds()
+  std::cout << std::fixed << "optimizePose: " << frame_bundle->getMinTimestampSeconds()
             << ", quat: " << T_imu_world.getEigenQuaternion().w() << ", " << T_imu_world.getEigenQuaternion().x()
             << ", " << T_imu_world.getEigenQuaternion().y() << ", " << T_imu_world.getEigenQuaternion().z() << ", "
             << "pos: " << T_imu_world.getPosition()[0] << ", " << T_imu_world.getPosition()[1] << ", "

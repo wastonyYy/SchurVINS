@@ -11,9 +11,50 @@
 #include <glog/logging.h>
 #include <vikit/output_helper.h>
 #include <visualization_msgs/Marker.h>
+#include <iostream>
+#include <fstream>
+#include <Eigen/Dense>
+
+// #include <svo_ros/visualizer.h>
+
+#include <deque>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Vector3Stamped.h>
+#include <sensor_msgs/image_encodings.h>
+#include <tf/tf.h>
+#include <ros/package.h>
+#include <cv_bridge/cv_bridge.h>
+
+#include <vikit/timer.h>
+#include <vikit/output_helper.h>
+#include <vikit/params_helper.h>
+
+#include <svo_msgs/DenseInput.h>
+#include <svo_msgs/DenseInputWithFeatures.h>
+#include <svo_msgs/Info.h>
+
+
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <Eigen/Dense>
+//
 
 namespace vk {
 namespace output_helper {
+
+//全局变量
+Vector3d prev_pos(0.0, 0.0, 0.0);
+ros::Time prev_timestamp = ros::Time(0);
+// Eigen::Vector3d dv;
+// Eigen::Vector3d dv{0.0,0.0,0.0};
 
 void publishTfTransform(
     const Transformation& T,
@@ -28,6 +69,11 @@ void publishTfTransform(
   tf::Quaternion tf_q; tf_q.setX(q.x()); tf_q.setY(q.y()); tf_q.setZ(q.z()); tf_q.setW(q.w());
   transform_msg.setRotation(tf_q);
   br.sendTransform(tf::StampedTransform(transform_msg, stamp, frame_id, child_frame_id));
+//改动
+  // std::cout << "Transform Position: [" 
+  //           << T.getPosition().x() << ", " 
+  //           << T.getPosition().y() << ", " 
+  //           << T.getPosition().z() << "]" << std::endl;
 }
 
 void publishPointMarker(
@@ -39,8 +85,13 @@ void publishPointMarker(
     int action,
     double marker_scale,
     const Vector3d& color,
-    ros::Duration lifetime)
+    ros::Duration lifetime
+    )
 {
+  //使用静态变量初始化
+  // static Vector3d prev_pos(0.0, 0.0, 0.0);
+  // static ros::Time prev_timestamp = ros::Time(0);
+
   visualization_msgs::Marker msg;
   msg.header.frame_id = "world";
   msg.header.stamp = timestamp;
@@ -64,7 +115,78 @@ void publishPointMarker(
   msg.pose.orientation.z = 0.0;
   msg.pose.orientation.w = 1.0;
   pub.publish(msg);
+
+// 打开文件用于写入（追加模式）
+    // std::ofstream outfile;
+    // outfile.open("/home/m/code/ros_ws/src/MH_01.txt", std::ios_base::app); // 请替换为你的文件路径
+    // if (outfile.tellp() == 0) {
+    //     outfile << "timestamp,dv.x,dv.y,dv.z,vx,vy,vz\n";
+    // }
+
+    // 如果之前的时间戳有效，计算并打印 dp 和 dv
+    if (prev_timestamp.toSec() != 0 && ns == "trajectory") {
+        Vector3d dp = pos - prev_pos;
+        ros::Duration dt = timestamp - prev_timestamp;
+        _dv = dp / dt.toSec();
+
+        // 打印到终端
+        // std::cout << "Velocity:\n"
+                  // << "v.x = " << pos[0] << "\nv.y = " << pos[1] << "\nv.z = " << pos[2] << std::endl;
+        
+        std::cout << "Time timestamp: " << timestamp << std::endl;
+        std::cout << "dv:\n"
+                  << "dv.x = " << _dv[0] << "\ndv.y = " << _dv[1] << "\ndv.z = " << _dv[2] << std::endl;
+
+        // 打印到文件
+        // std::ofstream outfile;
+        // outfile.open("/home/m/code/ros_ws/src/test.txt", std::ios_base::app);
+        // outfile << std::fixed << std::setprecision(4) // 保留四位小数
+        //         << timestamp.toSec() << ","
+        //         // << pos[0] << "," << pos[1] << "," << pos[2] << ","
+        //         << "  " << dv[0] << "," << dv[1] << "," << dv[2]<<"  ";
+        // outfile.close();
+    }
+    
+
+    // 更新之前的位置和时间戳
+    prev_pos = pos;
+    prev_timestamp = timestamp;
 }
+    
+
+//改动
+  // if (ns == "trajectory") {
+    // std::cout << "Point Position: [" 
+    //         << pos[0] << ", " 
+    //         << pos[1] << ", " 
+    //         << pos[2] << "]" << std::endl;
+    // std::cout << "Time ns: "
+    //         << ns << std::endl;
+  //}
+  // std::cout << "lifetime: "
+  //           << lifetime << std::endl;
+
+  // // If previous timestamp is valid, calculate and print dp and dv
+  // if (prev_timestamp.toSec() != 0 && ns == "trajectory") {
+  //     Vector3d dp = pos - prev_pos;
+  //     ros::Duration dt = timestamp - prev_timestamp;
+  //     Vector3d dv = dp / dt.toSec();
+  //     std::cout << "Time timestamp: "
+  //               << timestamp << std::endl;
+  //     // std::cout << "dp: [" 
+  //     //           << dp[0] << ", " 
+  //     //           << dp[1] << ", " 
+  //     //           << dp[2] << "]" << std::endl;
+  //     std::cout << "dv: \n" 
+  //               "dv.x = " << dv[0] << "\n"  
+  //               "dv.y = " << dv[1] << "\n" 
+  //               "dv.z = " << dv[2] << "\n" 
+  //               << std::endl;
+  // }
+
+  // Update previous position and timestamp
+
+
 
 void
 publishLineMarker(ros::Publisher pub,

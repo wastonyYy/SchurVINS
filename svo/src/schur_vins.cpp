@@ -25,6 +25,13 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 namespace schur_vins {
 
+// Vector15d SchurVINS::global_dx_imu_data = Vector15d::Zero();
+// Vector15d& SchurVINS::global_dx_imu = SchurVINS::global_dx_imu_data;
+// Eigen::Vector3d _dx_imu_1 = Eigen::Vector3d::Zero();
+
+Eigen::Vector3d _vel = Eigen::Vector3d::Zero();
+
+
 SchurVINS::SchurVINS() : curr_state(new ImuState()) {
     // LOG(INFO) << "init begins";
 }
@@ -131,7 +138,6 @@ void SchurVINS::PredictionState(const Eigen::Vector3d& acc, const Eigen::Vector3
     // k1
     const Eigen::Vector3d k1_dv = curr_state->quat * acc + gravity;
     const Eigen::Vector3d k1_dp = curr_state->vel;
-    // LOG(INFO) << "k1_dv: " << k1_dv[0] << ", " << k1_dv[1] << ", " << k1_dv[2];
 
     // k2
     const Eigen::Vector3d k1_v = curr_state->vel + k1_dv * dt / 2;
@@ -152,6 +158,24 @@ void SchurVINS::PredictionState(const Eigen::Vector3d& acc, const Eigen::Vector3
     curr_state->quat = q_full;
     curr_state->pos += dt / 6 * (k1_dp + 2 * k2_dp + 2 * k3_dp + k4_dp);
     curr_state->vel += dt / 6 * (k1_dv + 2 * k2_dv + 2 * k3_dv + k4_dv);
+    // std::cout << "pos: [" << curr_state->pos[0] << ", " << curr_state->pos[1] << ", " << curr_state->pos[2] << "]" << std::endl;
+    // std::cout << "dt: [" << dt << "]" << std::endl;
+    // std::cout << "vel: [" << curr_state->vel[0] << ", " << curr_state->vel[1] << ", " << curr_state->vel[2] << "]" << std::endl;
+
+    // Print quaternion
+    // std::cout << "orientation (quat): [" 
+    //           << curr_state->quat.x() << ", " 
+    //           << curr_state->quat.y() << ", " 
+    //           << curr_state->quat.z() << ", " 
+    //           << curr_state->quat.w() << "]" << std::endl;
+
+    // Convert quaternion to Euler angles and print
+    // Eigen::Quaterniond q(curr_state->quat);
+    // Eigen::Vector3d euler = q.toRotationMatrix().eulerAngles(0, 1, 2); // roll, pitch, yaw
+    // std::cout << "orientation (euler): [" 
+    //           << euler[0] << ", " 
+    //           << euler[1] << ", " 
+    //           << euler[2] << "]" << std::endl;
 }
 
 void SchurVINS::Prediction(double _dt, const Eigen::Vector3d& _acc, const Eigen::Vector3d& _gyr) {
@@ -437,6 +461,7 @@ void SchurVINS::StateUpdate(const Eigen::MatrixXd& hessian, const Eigen::VectorX
     Eigen::MatrixXd S = hessian * cov.bottomRightCorner(rows, rows) * hessian.transpose() + R;
     Eigen::MatrixXd K_T = S.ldlt().solve(hessian * cov.bottomRows(rows));
     Eigen::MatrixXd K = K_T.transpose();
+
     // std::cout << "K: " << S.rows() << " " << S.cols() << " " << hessian.rows() << " " << hessian.cols() << std::endl;
     // std::cout << "K: " << cov.rows() << " " << cov.cols() << " " <<cov.bottomRows(rows).rows() << " " <<
     // cov.bottomRows(rows).cols() << std::endl;
@@ -447,8 +472,12 @@ void SchurVINS::StateUpdate(const Eigen::MatrixXd& hessian, const Eigen::VectorX
 
     StateCorrection(K, Jacob_compress, delta_x, R);
     dsw_ = delta_x.tail(delta_x.rows() - 15);
-}
 
+}
+// void SchurVINS::SetImuVel(Eigen::Vector3d vel) {
+    
+// }
+    // Vector15d MyTest::_dx_imu_1 = Vector15d::Zero();
 void SchurVINS::StateCorrection(const Eigen::MatrixXd& K, const Eigen::MatrixXd& J, const Eigen::VectorXd& dX,
                             const Eigen::MatrixXd& R) {
     // Update the IMU state.
@@ -461,8 +490,36 @@ void SchurVINS::StateCorrection(const Eigen::MatrixXd& K, const Eigen::MatrixXd&
     curr_state->quat = new_quat;
     curr_state->pos += dx_imu.segment<3>(3);
     curr_state->vel += dx_imu.segment<3>(6);
+    _vel = curr_state->vel;
     curr_state->ba += dx_imu.segment<3>(9);
     curr_state->bg += dx_imu.segment<3>(12);
+
+    // _dx_imu_1= curr_state->vel;
+    // std::cout << "_dx_update_1: " << _dx_imu_1.transpose() << std::endl;
+
+    std::cout << "_Velocity: " <<"\n"
+              << "_v.x = "<< _vel[0] <<"\n"
+              << "_v.y = "<< _vel[1] <<"\n"
+              << "_v.z = "<< _vel[2]  
+              << std::endl;
+    std::cout << "Velocity: " <<"\n"
+              << "v.x = "<< curr_state->vel[0] <<"\n"
+              << "v.y = "<< curr_state->vel[1] <<"\n"
+              << "v.z = "<< curr_state->vel[2]  
+              << std::endl;
+
+    // waston::Print IMU state
+    // std::cout << "IMU State:" << std::endl;
+    // std::cout << "Position: [" << curr_state->pos[0] << ", " << curr_state->pos[1] << ", " << curr_state->pos[2] << "]" << std::endl;
+
+    //std::cout << "Quaternion: [" << curr_state->quat.w() << ", " << curr_state->quat.x() << ", " << curr_state->quat.y() << ", " << curr_state->quat.z() << "]" << std::endl;
+    
+    // std::ofstream outfile;
+    // outfile.open("/home/m/code/ros_ws/src/V2_03.txt", std::ios_base::app);
+    // outfile << std::fixed << std::setprecision(4) // 保留四位小数
+    //         << curr_state->vel[0] << "," << curr_state->vel[1] << "," << curr_state->vel[2] << "\n";
+    // outfile.close();
+
 
     int idx = 0;
     for (svo::StateMap::value_type& item : states_map) {
@@ -734,6 +791,11 @@ void SchurVINS::Forward(const svo::FrameBundle::Ptr frame_bundle) {
         //           << "ba: " << ba[0] << ", " << ba[1] << ", " << ba[2] << ", "
         //           << "bg: " << bg[0] << ", " << bg[1] << ", " << bg[2];
         // LOG(INFO) << "gravity: " << gravity[0] << ", " << gravity[1] << ", " << gravity[2];
+
+        // std::cout << "schurvins forward: " 
+        //           << "pos: " << pos[0] << ", " << pos[1] << ", " << pos[2] << ", " <<std::endl;
+        // std::cout << "vel: " << vel[0] << ", " << vel[1] << ", " << vel[2] << ", " <<std::endl;
+                  
     }
 }
 

@@ -5,6 +5,7 @@
 // Modification Note: 
 // This file may have been modified by the authors of SchurVINS.
 // (All authors of SchurVINS are with PICO department of ByteDance Corporation)
+#include"/home/m/code/ros_ws/src/svo/include/svo/schur_vins.h"
 #include <svo_ros/visualizer.h>
 
 #include <deque>
@@ -41,9 +42,51 @@
 #include <svo/img_align/sparse_img_align.h>
 #include <svo/reprojector.h>
 #include <rpg_common/pose.h>
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <Eigen/Dense>
 
-namespace
-{
+
+// extern Eigen::Vector3d dv;
+
+// void drawTextOnImage(cv::Mat& image, const std::string& text) {
+//     int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+//     double fontScale = 0.5;
+//     int thickness = 1;
+//     int baseline = 0;
+//     int y = 30; // Starting y position for the text
+//     // Split text into lines
+//     std::istringstream iss(text);
+//     std::string line;
+//     while (std::getline(iss, line)) {
+//         cv::Size textSize = cv::getTextSize(line, fontFace, fontScale, thickness, &baseline);
+//         cv::Point textOrg(10, y); // Starting position for the text
+//         // Draw the text on the image
+//         cv::putText(image, line, textOrg, fontFace, fontScale, cv::Scalar(255, 255, 255), thickness);
+//         y += textSize.height + 10; // Move to the next line
+//     }
+//     std::cout << "dv:\n"
+//           << "dv.x = " << dv[0] << "\ndv.y = " << dv[1] << "\ndv.z = " << dv[2] << std::endl;
+//     // // 额外添加 dv 信息
+//     std::ostringstream dvText;
+//     dvText << "dv.x = " << dv[0] << "\ndv.y = " << dv[1] << "\ndv.z = " << dv[2];
+//     std::istringstream dvIss(dvText.str());
+//     while (std::getline(dvIss, line)) {
+//         cv::Size textSize = cv::getTextSize(line, fontFace, fontScale, thickness, &baseline);
+//         cv::Point textOrg(10, y); // Starting position for the text
+//         // Draw the text on the image
+//         cv::putText(image, line, textOrg, fontFace, fontScale, cv::Scalar(255, 255, 255), thickness);
+//         y += textSize.height + 10; // Move to the next line
+//     }
+// }
+
+// Vector15d schur_vins::SchurVINS::global_dx_imu_data ;
+// Vector15d& schur_vins::SchurVINS::global_dx_imu ;
+
+
+
 void publishLineList(
     ros::Publisher& pub,
     const rpg::Aligned<std::vector, Eigen::Matrix<float, 1, 6>>& links,
@@ -140,7 +183,6 @@ void publishStringsAtPositions(
   pub.publish(ma);
 }
 
-}
 
 namespace svo
 {
@@ -408,10 +450,20 @@ void Visualizer::publishImages(const std::vector<cv::Mat>& images,
     img_msg.header.frame_id = "cam" + std::to_string(i);
     img_msg.image = img_pyr.at(img_pub_level_);
     img_msg.encoding = sensor_msgs::image_encodings::MONO8;
+
+    // cv::imshow("Image " + std::to_string(i), img_msg.image);
+    
+    // cv::waitKey(1); // Wait for 1 ms to allow the image to be displayed
+    // std::cout << "Publishing image " << i << " with timestamp: " << timestamp_nanoseconds
+    //           << " and frame_id: " << img_msg.header.frame_id << std::endl;
+
     pub_images_.at(i).publish(img_msg.toImageMsg());
   }
 }
 
+//void Visualizer::writeCaptionStr(cv::Mat& img);
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!
 void Visualizer::publishImagesWithFeatures(const FrameBundlePtr& frame_bundle,
                                            const int64_t timestamp,
                                            const bool draw_boundary)
@@ -439,9 +491,36 @@ void Visualizer::publishImagesWithFeatures(const FrameBundlePtr& frame_bundle,
     cv_bridge::CvImage img_msg;
     img_msg.header.frame_id = "cam";
     img_msg.header.seq = trace_id_;
+    // std::cout<<"vis_timestamp = "<<timestamp<<std::endl;
     img_msg.header.stamp = ros::Time().fromNSec(timestamp);
     img_msg.image = img_rgb;
     img_msg.encoding = sensor_msgs::image_encodings::BGR8;
+    std::ostringstream timestamp_ss;
+    timestamp_ss << std::fixed << std::setprecision(4) << img_msg.header.stamp.toSec();
+    std::string timestamp_str = timestamp_ss.str();
+    //---------------------------------------------------------打印在rviz的img中--------------------------------------
+    cv::putText(img_msg.image,timestamp_str,cv::Point(0,40),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(0,0,255),2,4);
+    std::string vel_str = "v.x:" + std::to_string(vk::output_helper::_dv.x()) + ",v.y:" + std::to_string(vk::output_helper::_dv.y()) + ",v.z:" + std::to_string(vk::output_helper::_dv.z());
+    cv::putText(img_msg.image, vel_str, cv::Point(0, 70), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 2,4);
+    std::string dv_str = "dv.x:" + std::to_string(vk::output_helper::_dv.x()-schur_vins::_vel[0]) + ",dv.y:" + std::to_string(vk::output_helper::_dv.y()-schur_vins::_vel[1]) + ",dv.z:" + std::to_string(vk::output_helper::_dv.z()-schur_vins::_vel[2]);
+    cv::putText(img_msg.image, dv_str, cv::Point(0,100), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0,0,255), 2,4);
+
+    // 全局小量
+    // Eigen::Vector3d vel  = schur_vins::_dx_imu_1.segment<3>(6);
+    // std::cout << "_dx_imu_1: " << schur_vins::_dx_imu_1<< std::endl;
+
+    // std::string dv_str = "v.x: " + std::to_string(schur_vins::global_dx_imu.segment<3>(6)) ;
+    // std::string dv_str = "v.x: " + std::to_string(schur_vins::SchurVINS::global_dx_imu.segment<3>(6));
+
+
+    //+ ", v.y: " + std::to_string(vk::output_helper::_dv.y()) + ", v.z: " + std::to_string(vk::output_helper::_dv.z());
+    // cv::putText(img_msg.image, dv_str, cv::Point(50,60), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(255,23,0), 4, 8);
+    
+    cv::waitKey(1); // Wait for 1 ms to allow the image to be displayed
+    
+    std::cout << "Publishing image with features " << i << " with timestamp: " << timestamp
+              << " and frame_id: " << img_msg.header.frame_id << std::endl;
+
     pub_images_.at(i).publish(img_msg.toImageMsg());
   }
 }

@@ -77,6 +77,12 @@ void BackendVisualizer::visualizeFrames(const gtsam::Values& values)
     p.y = xyz.y();
     p.z = xyz.z();
     m.points.push_back(p);
+    // 打印每个帧的位置
+    //std::cout << "Frame position: [" << p.x << ", " << p.y << ", " << p.z << "]" << std::endl;
+    // 获取并打印旋转矩阵
+    // Eigen::Matrix3d rotation_matrix = it->value.rotation().matrix();
+    // std::cout << "Frame rotation matrix:\n" << rotation_matrix << std::endl;
+  }
   }
   pub_markers_.publish(m);
   VLOG(30) << "Viz: Published " << m.points.size() << " frames.";
@@ -153,6 +159,7 @@ void BackendVisualizer::visualizePoints(const gtsam::Values& values)
     p.y = xyz.y();
     p.z = xyz.z();
     m.points.push_back(p);
+    std::cout<<"p.x,p.y,p.z =["<<p.x<<p.y<<p.z<<"]"<<endl;
   }
   pub_markers_.publish(m);
   VLOG(30) << "Viz: Published " << m.points.size() << " points.";

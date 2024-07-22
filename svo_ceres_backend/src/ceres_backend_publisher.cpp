@@ -59,6 +59,9 @@ void CeresBackendPublisher::publishImuPose(const ViNodeState& state,
     std::lock_guard<std::mutex> lock(mutex_frame_id_);
     state_frame_id_ = BundleId(seq);
   }
+    //打印
+  // Eigen::Vector3d W_v_B = state.get_W_v_B();
+  // std::cout << "W_v_B_: [" << W_v_B[0] << ", " << W_v_B[1] << ", " << W_v_B[2] << "]" << std::endl;
 
   size_t n_pose_sub = pub_imu_pose_.getNumSubscribers();
   size_t n_pose_viz_sub = pub_imu_pose_viz_.getNumSubscribers();

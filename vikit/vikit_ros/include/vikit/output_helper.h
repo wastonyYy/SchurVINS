@@ -13,6 +13,29 @@
 #include <tf/transform_broadcaster.h>
 #include <kindr/minimal/quat-transformation.h>
 
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Vector3Stamped.h>
+#include <sensor_msgs/image_encodings.h>
+#include <tf/tf.h>
+#include <ros/package.h>
+#include <cv_bridge/cv_bridge.h>
+
+#include <vikit/timer.h>
+#include <vikit/output_helper.h>
+#include <vikit/params_helper.h>
+
+#include <svo_msgs/DenseInput.h>
+#include <svo_msgs/DenseInputWithFeatures.h>
+#include <svo_msgs/Info.h>
+
+
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <Eigen/Dense>
 namespace vk {
 
 using Transformation = kindr::minimal::QuatTransformation;
@@ -22,12 +45,16 @@ namespace output_helper {
 using namespace std;
 using namespace Eigen;
 
+Eigen::Vector3d _dv;
+
 void publishTfTransform(
     const Transformation& T,
     const ros::Time& stamp,
     const string& frame_id,
     const string& child_frame_id,
     tf::TransformBroadcaster& br);
+
+
 
 void publishPointMarker(
     ros::Publisher pub,
@@ -38,7 +65,13 @@ void publishPointMarker(
     int action,
     double marker_scale,
     const Vector3d& color,
-    ros::Duration lifetime = ros::Duration(0.0));
+    ros::Duration lifetime = ros::Duration(0.0)
+    // //改动
+    // const Vector3d& prev_pos,
+    // const ros::Time& prev_timestamp,
+    // const Vector3d& d_pose,
+    // const ros::Time& d_time
+    );
 
 void publishLineMarker(
     ros::Publisher pub,

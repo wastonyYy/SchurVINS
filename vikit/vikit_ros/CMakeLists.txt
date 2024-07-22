@@ -10,11 +10,14 @@ set(HEADERS
   include/vikit/img_type_conversion.h
   include/vikit/output_helper.h
   include/vikit/params_helper.h
+  #改动
+  # include/vikit/shared_data.h
   )
 
 set(SOURCES
   src/output_helper.cpp
   src/img_type_conversion.cpp
+  # src/shared_data.cpp
   )
 
 # Create vikit library

@@ -8,13 +8,14 @@ include(ExternalProject)
 
 file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
-ExternalProject_Add(dbow2_src
-  GIT_REPOSITORY https://github.com/dorian3d/DBoW2.git
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
-  BUILD_COMMAND CXXFLAGS=-i${CATKIN_DEVEL_PREFIX}/include make
-  INSTALL_COMMAND make install
-)
-ExternalProject_CatkinInstall(dbow2_src)
+# 改动，应该判断一下如果文件存在就不运行
+# ExternalProject_Add(dbow2_src
+#   GIT_REPOSITORY https://github.com/dorian3d/DBoW2.git
+#   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
+#   BUILD_COMMAND CXXFLAGS=-i${CATKIN_DEVEL_PREFIX}/include make
+#   INSTALL_COMMAND make install
+# )
+# ExternalProject_CatkinInstall(dbow2_src)
 
 cs_add_library(${PROJECT_NAME} SHARED src/dependency_tracker.cc)
 add_dependencies(${PROJECT_NAME} dbow2_src)
